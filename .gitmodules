@@ -1,0 +1,3 @@
+[submodule "vendor/phocoa"]
+	path = vendor/phocoa
+	url = git://github.com/apinstein/phocoa.git

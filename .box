@@ -1,0 +1,4 @@
+php_version: '5.2.17'
+php_extensions: [apc, yaml, json]
+document_root: /wwwroot
+default_gateway: index.php

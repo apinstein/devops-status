@@ -1,0 +1,7 @@
+
+selectedPeople: 
+  class     : WFDynamic
+  properties: 
+    arrayController  : '#module#selectedPeople'
+    simpleBindKeyPath: name
+    widgetClass      : WFLabel

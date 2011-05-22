@@ -1,0 +1,38 @@
+
+form: 
+  children  : 
+    email  : 
+      bindings  : 
+        value: 
+          controllerKey: 
+          instanceID   : email
+          modelKeyPath : toEmail
+      class     : WFTextField
+      properties: 
+        size: 50
+    message: 
+      bindings  : 
+        value: 
+          controllerKey: 
+          instanceID   : email
+          modelKeyPath : message
+      class     : WFTextArea
+      properties: 
+        cols: 50
+        rows: 10
+    subject: 
+      bindings  : 
+        value: 
+          controllerKey: 
+          instanceID   : email
+          modelKeyPath : subject
+      class     : WFTextField
+      properties: 
+        size: 50
+    send : 
+      class     : WFSubmit
+      properties: 
+        label: Send Email
+  class     : WFForm
+  properties: 
+    method: get

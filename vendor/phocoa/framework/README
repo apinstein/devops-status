@@ -1,0 +1,332 @@
+/* vim: set expandtab tabstop=4 shiftwidth=4 ignorecase: */
+
+README for the Cocoa-Style PHP Framework (PHOCOA)
+
+Both CLI and HTTP access to functionality is available. In the HTTP environment, everything is bootstrapped automatically, you need only write WFModule subclasses to add request handlers. On the CLI side, there is now an autoload mechanism in place. To bootstrap the PHOCOA environment, you need only include the webapp.conf file at the top of the CLI script. We recommend setting up and ENV PHOCOA_PROJECT_CONF with the absolute path to the webapp.conf file and then using this at the top of all CLI scripts:
+
+require_once getenv('PHOCOA_PROJECT_CONF');
+
+This will bootstrap the web application, load the application delegate, etc. PHOCOA's autoload mechanism will then call into your app to allow you to provide autoloading for your systems.
+
+?? Eventually this could be wrapped in a phing script that figures out the current project and automatically sets this ENV and calls your script.
+
+-------------------------------
+
+Dependencies
+1) PHP5
+2) Propel is nice (http://propel.phpdb.org)
+- works with Propel 1.2 or Propel 1.3
+- Propel 1.3 is preferred
+    - need to use SVN creole
+3) Pear Packages
+- Mail
+- Mail_Mime
+- Log
+- Horde/Yaml (or syck)
+4) Phing - 2.3.0
+5) Smarty
+6) YUI: http://developer.yahoo.com/yui
+--> To upgrade the YUI, download it from YAHOO, then:
+rsync --dry-run -vvrC --del ~/Downloads/yui/build/ ~/dev/sandbox/phocoa/phocoa/wwwroot/www/framework/yui
+** when happy, remove --dry-run
+Then update subversion
+cd wwwroot/www/framework/yui
+svn st | grep '^!' | awk '{ print $2; }' | xargs svn rm
+svn st | grep '^?' | awk '{ print $2; }' | xargs svn add
+** We used to have to edit YUI code, but we've fixed that with our internal sandboxing solution. 
+** Consider making phocoa use yahoo-hosted-yui-files out of the box, with an alternative to download.
+
+
+TODO
+
+1.0 Milestone:
+- DEPLOYMENT AND PROJECT MANAGEMENT
+  - Rakefile
+    - bootstrap Rakefile conf file, properties.yml template, etc
+    - phocoa rake tasks:
+      - create project dirs
+  - Cap
+    - bootstrap Capfile, deploy.rb
+      - phocoa cap tasks:
+        - maintenance mode: move "maintenance" to a built-in module
+        - gitflow tasks
+- (DONE) Make phocoa shell not die on fatal errors (use http://us2.php.net/manual/en/intro.runkit.php)
+- PhpUnit integration, see http://github.com/jetviper21/nimblize/tree/master/nimble_test/lib
+- ValueTransformer "byName" stuff is stupid; update the valueTransformerForName to look for class as full name ie WFIsEmptyTransformer should work as well as WFIsEmpty
+- Clean up module instantiation (needed for RESTful ease as well). See: http://misko.hevery.com/2008/09/10/where-have-all-the-new-operators-gone/
+- Incorporte PHP Speedy or Minify (http://code.google.com/p/minify). Minify looks better.
+- BUILDFile of some kind: rake? phing? This will do things like minify JS, bump version #, etc.
+- Find a way to add a warning when people use binding options that don't exist? it's really painful to debug "Formatter" vs "formatter"
+- (DONE) YUILoader solution: instead of inline yuiloader bootstrapping, have a singleton PHOCOAYUILoader that proxies all requests. Turns N widgets on a page into a single YUI require, and that one's callback will call back all of the widgets that requested it
+- Get WFDateTimeFormatter working... object issues with bindings
+- Need to track whether or not a widget was "restored" so we can skip pushbindings if the data wasn't in the request stream. This is important for things like dynamically hidden fields... creationDts, fkId, etc.
+- The "default" class for the WFControllers is WFDictionary... I think maybe we can use ArrayObject, which is an PHP5 SPL class (or at least subclass it). Need more testing...
+- WFAuthorizationManager has a "version" used to invalidate sessions when the data structure changes, but there's no way to do this from userland. WFAuthorizationDelegate should have a "version" delegate method used to invalidate the authorization info.
+- Can we add "default values" to parameters for parameterList('name' => 'defaultValue') the way we did for: phocoa builder/exportPhocoaBuilderIntegrationInfo.php
+  - would simplify default value setup
+  - I think it's safe re php spec
+      - only worry is ordering - of course ordering is *very* important to us; I am pretty sure that PHP arrays always preserve key ordering
+  - Maybe even add deeper options so we can automate common things like array-passing?
+    return array( 'idsToIgnore' => array(
+                                         'default' => '1,2',
+                                         'splitIntoArray' => ','
+                                         )
+                )
+- WFErrorsException improvement: in WFPage, where we catch it, walk thru all widgets' bindings and look for errors matching the key(Path?) for that binding and map thru to the widget so that
+  we don't have to do this in the controllers:
+           $e->propagateErrorsForKeyToWidget('hfov', $page->outlet("virtualTourFOV_{$inimg->getTourInboxImageId()}"));
+- IDEA: Make ObjectControllers inherently handle "Decorator" classses where you can specify a decorator class to be used to "wrap" any object returned by the ObjectController. There would be a WFDecorator base class that just handles "decoratedObject" and passes everything through (via __call and/or KVC implementations). 
+- Need to update bindings setup infrastructure to handle STATIC KVC. Think about whether or not we should enable static KVC calls to an INSTANCE. Right now that throws an error.
+- IDEA: Instead of having to restore state each time the page loads, couldn't we just serialize the entire state to the session and re-load that? Seems that it would be much faster and more accurate.
+  Of course, then have to deal with what happens when state is out-of-sync with DB.
+  Also, have to deal with 2 contexts; when having one page loaded in 2 windows, do they SHARE state or have SEPARATE state? Or do we let the developer decide?
+- Instead of having to make Propel or Doctrine subclass WFObject, try http://www.php.net/aggregate to inject WFObject protocol...
+- Maybe phocoa shouldn't "take over" entire /WWWROOT/ URL path. Instead, just let people drop modules wherever, and those pages should start with:
+  require('../conf/webapp.conf');
+  WFWebApplicationMain();
+  // WFModule subclass here
+  - this way we could store css, img, etc in the same folder as the module... add {$MODULE_WWW_DIR} to smarty?
+  - this would also make it possible to use phocoa on ONE PAGE on your site, to try it out. would be good for adoption!
+- Add Expires header automatically to skin system? For css and such? Or just add it in code...
+- Routing infrastructure: right now it's all hard-coded. Probably need to add some hooks for URL rewriting. Someone suggested looking at http://dev.horde.org/routes/
+- Finish WFAutoForm - is this really useful? do we really want some kind of "template" system for common list/detail/edit views?
+  - Talk to Mark F about his experiences
+  - Look at HTML_QuickForm, QCodo, Symfony, CodeIgniter, RoR
+  - Re-build "code-gen" things to build WFAutoForm instead
+  - Update PHOCOA Builder to allow browsing ( or instantiating ) of PHP Objects, & drag-drop an object onto an interface
+- RESTful infrastructure; TRICKY! See framework/resftul.patch; see http://www.krisjordan.com/2008/12/02/towards-restful-php-5-basic-tips/ for tips
+- Should track which binding options actually get *processed* somehow, so that we can report on ones that *don't* which is useful for debugging.
+- WFModule/Page architecture
+  - Can we "cache" the "state" of the page sent before rendering? And then restore it instead of "bootstrapping" again? Would mean that we could then do KVO more cleanly.
+    Could even have a "alwaysDoPostback" mode that would postBack to ensure only one UI change made at a time; this would nearly fully replicate desktop environment
+  - (DONE) Have a sep WFPage delegate for each page in a module; ensure BC (DONE)
+  - (DONE) Add some change detection to WFDynamic / WFArrayController so we can automatically and efficiently handle createWidgets() needing to be called multiple times to detect changes.
+  - Add in a bunch more "life-cycle" callbacks
+    - (DONE) noAction
+    - (TBD) handleException - for uncaught exceptions, give the page (and then the module?) a chance to process it.
+    - SEE WFPageDelegate Documentation
+    - ?? preAction, or maybe validate (so that you can combine field-level KVC with validation done in the "action" callback
+- Should we refactor canPushValueBinding() into OPTION_READ_WRITE_MODE_*? look at canRead* canWrite* in bindings.
+  - also make WFBindingSetup a FLUENT interface
+- Validator Issues
+  - DEVELOP TEST CASES!
+  - Validators aren't run automatically; only by bindings infrastructure, is that a bad thing?
+  - No way to automatically run validators for an entire object (ie to catch non-single-field validation issues)
+    - validateObject() callback for validating JUST the object as a whole; things that can't be done per-property
+    - validate() calls all KVC validators AND validateObject
+    - pushBindings should call validateObject() once all individual ones are called
+  - DONE No way to create validation errors from save() and have the FW catch them automatically (done via WFErrorsException)
+    - Maybe this isn't a problem? Pages should try/catch around things that can throw and wrap errors into a WFError... 
+      OR should we do this try/catch and WFError wrapping automatically, and just let the action method OVERRIDE that if it is desirable to NOT catch that error?
+      OR maybe we could throw a special type of exception from the action method that WON'T be caught by the FW if we want the exception to escalate...
+- Something seems slightly off with binding options setup. When bind() is done, seems that it should coalesce default binding option, but it isn't. They're being done
+  all over the place (pullBindings, processBindingOptions, etc). Seems that the bind() process should coalesce those for you. What does processBindingOptions do anyway?
+- Can we add "NullPlaceholder" to text field and text area so there can be some "help" text that gets automatically "converted" to/from NULL?
+  - see how Cocoa does this; may need JS to implement
+- Have the newproject script make -dev and -production and -staging versions of conf files
+- Do we need namespacing for modules? What if you have 2 "included" modules on a page that both have a widget with id=name? Things won't work right... right?
+- E_STRICT support
+- WFTreeController
+- Support PRG (Post-Redirect-Get) workflow; include some kind of "PRGMessage" infrastructure that makes it easy to record a message for the subsequent GET.
+  - cache control for POST forms
+  - framework support for PRGMessage. Maybe something like $page->doPRG($url, "Message...", "messageBoxId")
+    The framework would then record the "message" in the session for the $url; then WFPage can autoamtically call page->outlet('messageBoxId')->setValue('message') and clear the session setting?
+- Integrate YAHOO js library to the extent that events can be attached to widgets; build a nice infrastructure for that
+  - deprecate current js action handlers? dunno... direct onClick handlers and such are still very useful
+  - support tooltips on all wfview objects
+- Outline and Document Naming Conventions for widgets to use for javascript functions, id, etc
+- Decide on convention for loading JS files; should widgets document the needed files and require modules to load them, or should they try to always do it themselves?
+  - Seem to have a good way to load JS/CSS for widgets with the PHOCOA. stuff, but what about loading phocoa.js and prototype.js? Skin? Require modules to do it?
+- Add remember me support to login module; make sure needed support is in session code; test
+- Add pear channel support for installation
+  - dependencies; propel, phing, creole, etc
+- WFRequestControllerDelegate -> has callbacks to process paths before default option; allows people to implement URI mapping, pre-processing, error handlers (404) etc
+  -> Add WFRequestControllerException system; 404, 302, etc by throwing exceptions. How does this impact current WFRedirectRequestException?
+- Figure out a way to implement .ibpalette type functionality
+  -> Creating widget bundles that are drop-in compatible
+  -> Figure out better way for re-using modules so that they can be used as widgets of other pages: tricky life-cycle consequences
+  -> Basic idea that pages and views are handled the same way.
+- I18N infrastructure -> Like Cocoa; WFLocalizedStringForString:
+  - thoughts:
+  - each module should be localized independently; thus a module's dir structure would look like:
+    myModule/
+            myModule.php
+            English.lproj/
+                shared.instances
+                shared.config
+                myPage.instances
+                myPage.config
+                myPage.tpl
+                Localizable.strings
+            French.lproj
+                shared.instances
+                shared.config
+                myPage.instances
+                myPage.config
+                myPage.tpl
+                Localizable.strings
+    - the current locale can be tracked by session?
+    - there probably needs to be a place for "app-wide" .strings files, so common strings can be handled in one place instead of multiple places. maybe a Localized.strings/ folder at the root (where skins and modules etc are) that can be easily accessed from any module via WFLocalizedString("my string") will search Localized.strings first, then Application.strings
+    - smarty plugin for accessing localized strings from smarty
+    - improve the WF*DateFormatters to include "short,medium,long,full" default formats for each locale; timeFormat / dateFormat settings as alternatives to formatString (whose default would now be %X %x where %X=localized date and %x=localized time
+    - improve the WFNumberFormatters to be automatic based on locale
+    - ability to point the system to particular .strings file for generic localization; for instance, a set of localizations may be provided for database data, and a propel getDescription() accessor may be overridden to translate the data from the DB based on a .strings file
+    - need to be able to localize skins too, I suppose...
+    - need some convention for localizing images, css, etc, for both skins and modules
+
+- [ LOW ] Implement caching
+  - NOTE: I started to play with this a little, returning a cache from WFModuleInvocation::execute() as a test, but it wasn't any faster! Need to profile a bit to see WTF.
+  - Each module/page should determine whether or not it's cacheable (via a callback), and for how long, etc
+  - store modulepage caches in runtime/
+  - benchmark?
+
+- Improve 'default' template to a nice-looking
+    - (Done) YUI CSS
+    - (Done) Menu based on YUI
+- (DONE) Idea to get stuff in TPL file into <head> section! Create a {WFHead} block tag and have it addHeadString() if there's a skin; dump directly if not.
+  - document this - probably need a section on "page template and layout control"
+- (DONE) Fix bug in base64_encode -- this is *NOT* URL safe as base64 uses / character! see WFModule / showcase EncryptionUtil hexencode/hexdecode
+  - WFWebApplication::serializeURL()/unserializeURL()
+- (DONE) Add page->setTemplateFile() to allow system to use alternate .tpl file -- easier for confirm/thanks pages that can share data with another page w/o passing data via module instance vars just to be re-assigned to the $page in the other page.
+- (DONE) Add an interactive PHP shell for exploring your projects.
+- (DONE) Add a WFViewPhocoaBuilderIntegration interface to house the informal protocol for making the PHOCOA builder more useful; add support to all widgets.
+- (DONE) Move .config and .instances files to YAML to improve compatibility for people managing with text files and make other GUI editors easier to write.
+  - (DONE) Convert existing projects to YAML setup with new converters.
+  - (DONE) Update PHOCOA Builder to use syck/yaml parser directly, thus skipping the PHP interaction to read the files.
+- (DONE) Can we add a "module search path"? This would be used so that we can search for modules along multiple filesystem paths, and thus wouldn't need to copy framework modules
+  into project directories. See WFWebApplication::addModulePath()
+- (DONE) prototypes for the WFDynamic controls so you can "configure" the default setup for a widget in a table, matrix, etc
+- Improve bindings support:
+    - (DONE) Read only...
+    - (DONE) Single Value Binding (currently what we do)
+    - (DONE) Multi-Value Bindings (automatically read-only)
+        - (DONE) Boolean: enabled && enabled2 && enabled3, OR hidden || hidden2 || hidden3
+        - (DONE) Pattern: Ability to craft strings together from multiple values, a la formatstring: value="#%1% of %2% selected." The formatstring is set in the binding option "ValuePattern".
+        - (NA) Argument: for target-action: can call a selector with multiple arguments (not required b/c our actions don't currently accept any arguments)
+- (DONE) Array operators: http://developer.apple.com/documentation/Cocoa/Conceptual/KeyValueCoding/Concepts/ArrayOperators.html
+- (DONE) Skins should be attached to the root invocation, not to the request. This way one can access the skin for the current module rather than only for the "current request".
+- (DONE) Need to make "skin" available from page. For things like email and sub-modules the "skin" desired is different, but widgets and such need to be able to add to "head" element etc. Figure something out for that.
+- (DONE) Add new project support for httpd.conf vs. .htaccess (via RewriteRule)
+- (DONE) Change setup of wwwroot/www/framework; instead of cp -R, maybe use a httpd.conf directive or a RewriteRule or a symlink to avoid having to "sync" the framework stuff?
+
+PERFORMANCE THINGS:
+- WFLog is SLOW! Because PEAR/Log is slow, and it's also inefficient (calls WFWebApplication::sharedWebApplication() a lot). We can probably use a lightweight custom logger.
+  -> fix now at least so that if logged is turned OFF it's much faster. Can build our own logger later for speeding up actual logging, but it's not used much in production.
+
+WFState -- idea for a simple widget to help stuff state in a form. Would simply serialize passed data and put it into a hidden var... and restore state! with bindings!
+WFTabView -- rename to WFTabbedFormPanel? It must be in a form, and uses restoreState() from WFWidget, so this would make sense... also, remove "non-onepage" mode as we'll use a WFTabbedNavigationView for that.
+
+WFSession - still needs to be designed. The current design sucks.
+
+The page cycle is still really tricky... look at this further... ideas:
+1) Do we need a callback for "noaction?" or is "if ($page->hasSubmittedForm())" good enough inside of _PageDidLoad?
+2) Do we need more hooks? Do things happen in the right order? The way things are created, restored, etc, seems fragile. Light hacking occuring to make it work in some situations.
+
+ARCHITECTURAL THINGS TO INVESTIGATE
+Use of FilterIterator as predicate searching.
+
+DOCUMENTATION:: API GUIDE:: SELF-DOCUMENTING CODE WITH PHPDOCUMENTOR
+We use PHPDOC (included in Pear) to document the code: http://manual.phpdoc.org/HTMLframesConverter/default/
+
+Each file should have the following at the top:
+
+/* vim: set expandtab tabstop=4 shiftwidth=4: */
+/**
+ * @package KeyValueCoding
+ * @subpackage Bindings
+ * @copyright Copyright (c) 2005 Alan Pinstein. All Rights Reserved.
+ * @version $Id: kvcoding.php,v 1.3 2004/12/12 02:44:09 alanpinstein Exp $
+ * @author Alan Pinstein <apinstein@mac.com>                        
+ */
+
+The Package should be the section of the framework that you're working on. The default is framework-base, so use that if it's something basic.
+Here are the top-level packages so far (no spaces allowed)
+framework-base
+KeyValueCoding
+UI
+WebApplication
+
+Subpackages are just for useful navigation within the packages. Do what makes sense, but start with Captial SubPackage Names!
+
+DOCUMENTATION:: USER GUIDE:: DOCBOOK
+DocBook Format. See http://opensource.bureau-cornavin.com/crash-course/ or http://www.docbook.org/tdg5/en/html/docbook.html
+Edit with XMLMind's XXE WYSIWYG Editor.
+
+BUILD SYSTEM:
+The "phocoa" script wraps phing which is used to do project tasks such as creating new modules, pages, and code-gen from propel.
+
+CONVENTIONS
+
+CLASS NAMES
+WF<ClassName>
+
+WF = "Web Framework"
+
+FUNCTION NAMING - use title case, start with lowercase
+sampleFunctionName()
+
+This naming convention is purposely different from the php naming convention so that you can easily tell the difference between framework functions and php functions.
+
+INTERFACES / PROTOCOLS
+Our web framework uses many techniques similar to Apple's Cocoa environment. One of the is the use of PROTOCOLS, both FORMAL and INFORMAL. In PHP, the FORMAL protocols are defined / implemented as PHP5 interfaces. INFORMAL protocols (protocols where not ALL methods must be implemented, common for delegates) are defined as PHP interfaces, but in implemention, you only add the methods, you do not do "implements WFBlahProtocol".
+
+Informal protocols for delegates are typically defined (basically for documentation purposes) as PHP classes ending in Delegate. For instance, WFWebApplicationDelegate.
+
+INCLUDES
+All script files should start with:
+
+require '../relative-path-to/conf/webapp.conf';
+
+Alternatively, you can use:
+
+require_once getenv('PHOCOA_PROJECT_CONF');
+
+And just define that in the ENV before running your script.
+
+This one include will set up the PHP include_path so that all remaining includes can be done as relative to the root directory of the project. This is true for CLI scripts as well.
+
+----------------------------------
+
+Generating tags files from the source: (BTW these are all good candiates for the PHING build system!)
+cd to webframework
+ctags -R
+
+Generating PHPDoc (PhpDocumentor 1.3.0 stable is suggested)
+cd to phocoa 
+/sw/bin/phpdoc -dn framework-base -t docs/phpdocs -ti "PHOCOA Documentation" --ignore 'test' -d 'docs/tutorials,framework,smarty/plugins' -f 'conf/webapp.conf'
+
+PROPEL
+To use propel, need to include the PHOCOA code and make Propel's BaseObject.php extend WFObject. Be sure to include via FRAMEWORK_DIR rather than hard-coded so that multiple instances can live on a single server.
+
+ERROR HANDLING
+Should we have a WFException class? This class would have the following properties:
+- errorActions (LOG, EMAIL)
+- severity (WARN, FATAL)
+Methods:
+handleException($e)
+  if LOG, LOG error
+  if EMAIL, email error
+  if FATAL, display error and halt execution
+    - display error on development, display nice page on production
+  if WARNING, procede (of course client can re-throw)
+
+** maybe the LOG/EMAIL thing should be a site-wide config?
+
+GENERAL
+
+USERLAND
+For several things need a userland solution so that framework can be updated independently and harmlessly from main application.
+--> templates (ie errors, dynamic smarty template, page not found, etc)
+--> modules (maybe a contrib directory will include all bundled ones? system will check modules first, then check APP/contrib/modules to allow overriding?)
+
+FRAMEWORK ARCHITECTURE
+- Need to decide about full-path-widget-ids (ie myForm.name vs name so we can have form-based namespaces) NO just make them all unique.
+
+LIST OF DIFFERENCES FROM COCOA, for helping people who know Cocoa.
+1) NSControl / NSCell - These are used heavily in Cocoa to handle the UI. All NSControls are NSView subclasses, which adds lots of overhead. Cocoa also has NSCell classes which handle a lot of the events and drawing. Since we don't have to deal with complex UI event handling (ie mouse tracking, etc), we have only NSControls for the UI.
+2) Bindings - We don't implement KVO (Key-Value Observing) because we aren't a real-time interactive system. HTTP requests and forms essentially "batch" changes and then repaint the entire screen. So instead of having everything real-time, we simply use bindings ONCE on the way in (to restore the WFRequestView) and once on the way out (so the UI controls can "grab" their proper values).
+NOTE: if we ever want to try to do real KVO, see http://weierophinney.net/matthew/archives/199-A-Simple-PHP-Publish-Subscribe-System.html and also consider a PHP extension that implements something like "__willCall" or "__didCall"
+
+Another reason for this is that Obj-C runtime can intercept calls to setXXX() and trigger observing events. We can't do that from PHP. Delaying the "reading" of bound data until after the code has run allows developers to use setXXX() calls and still have the values reflected in the UI.
+NOTE: Examine ArrayAccess interface; this may allow us to detect calls, at least with $obj['propName'] = XXX syntax!
+3) WFFormatters. Our formatters are linked in with the same error mechanism as the validators. In Cocoa, the formatters run in a real-time UI environment, and they can literally stop bad data from being entered. For us, they're more of a convenience item for display and validating well-known data types. This could change with AJAX.

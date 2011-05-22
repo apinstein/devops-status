@@ -1,0 +1,80 @@
+
+form: 
+  children  : 
+    action1       : 
+      class     : WFSubmit
+      properties: 
+        label: Submit Form and Re-Display
+    creationDTS   : 
+      bindings  : 
+        value: 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : creationDTS
+      class     : WFLabel
+      properties: 
+        formatter: '#module#creationDTSFormatter'
+    name          : 
+      bindings: 
+        value: 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : name
+      class   : WFTextField
+    radioButtons  : 
+      bindings: 
+        value: 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : gender
+      children: 
+        radioOne: 
+          class     : WFRadio
+          properties: 
+            label        : Female
+            selectedValue: female
+        radioTwo: 
+          class     : WFRadio
+          properties: 
+            label        : Male
+            selectedValue: male
+      class   : WFRadioGroup
+    selectMultiple: 
+      bindings  : 
+        contentValues: 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : colorValues
+        values       : 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : favoriteColors
+      class     : WFSelect
+      properties: 
+        multiple    : true
+        visibleItems: 6
+    selectOne     : 
+      bindings: 
+        contentLabels: 
+          controllerKey: arrangedObjects
+          instanceID   : cities
+          modelKeyPath : name
+        contentValues: 
+          controllerKey: arrangedObjects
+          instanceID   : cities
+          modelKeyPath : id
+        value        : 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : cityID
+      class   : WFSelect
+    textarea      : 
+      bindings: 
+        value: 
+          controllerKey: selection
+          instanceID   : person
+          modelKeyPath : bio
+      class   : WFTextArea
+  class     : WFForm
+  properties: 
+    method: post

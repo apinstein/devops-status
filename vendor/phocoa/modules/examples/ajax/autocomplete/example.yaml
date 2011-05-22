@@ -1,0 +1,25 @@
+logger:
+  class: WFYAHOO_widget_Logger
+color: 
+  bindings  : 
+    datasourceJSArray: 
+      instanceID  : '#module#'
+      modelKeyPath: rainbow
+  class     : WFYAHOO_widget_AutoComplete
+  properties: 
+    minQueryLength     : 0
+    width              : 100px
+state: 
+  bindings  : 
+    datasourceJSArray: 
+      instanceID  : '#module#'
+      modelKeyPath: states
+  class     : WFYAHOO_widget_AutoComplete
+  properties: 
+    minQueryLength     : 2
+stateAjax: 
+  class     : WFYAHOO_widget_AutoComplete
+  properties: 
+    dynamicDataLoader: stateSearcher
+    dynamicDataLoaderSchema: state, st
+    minQueryLength     : 2

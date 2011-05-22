@@ -1,0 +1,13 @@
+
+name: 
+  bindings: 
+    value: 
+      controllerKey: selection
+      instanceID   : person
+      modelKeyPath : name
+  class   : WFTextField
+fancyField: 
+  class   : WFTextField
+  properties:
+    nullPlaceholder: Enter Text Here
+    

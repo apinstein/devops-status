@@ -1,0 +1,133 @@
+/* TABS */
+div.phocoaTabNav {
+float:left;  
+font-size:93%;
+line-height:normal;
+text-align: left;
+width: 100%; 
+margin: 0;
+}
+div.phocoaTabNav ul {
+margin:0;
+padding:10px 10px 0 0;
+list-style:none;
+}
+div.phocoaTabNav li {
+float:left;  
+margin:0;
+padding:0;
+}
+div.phocoaTabNav a {
+display: block;
+padding:5px 15px 4px 15px;
+background: white;
+border: 1px solid black;
+}
+div.phocoaTabNav a:link, div.phocoaTabNav a:visited, div.phocoaTabNav a:hover, div.phocoaTabNav a:active {
+    color: black;
+    text-decoration: none;
+}
+div.phocoaTabNav a:hover, div.phocoaTabNav a:active {
+    text-decoration: underline;
+}
+div.phocoaTabNav .active {
+}
+div.phocoaTabNav .active a {
+padding-bottom:5px;
+background-color: gray;
+}
+div.phocoaTabContent {
+clear: both;
+position: relative;
+top: -1px;
+margin: 0;
+padding: 10px 10px 10px 20px;
+border-top: 1px solid black;
+border-left: 1px solid black;
+border-bottom: 1px solid black;
+border-right: 1px solid black;
+}
+
+div.phocoaWFMessageBox {
+    color: black;
+    width: 350px;
+    border: 1px solid black;
+    padding: 5px;
+    margin: 0;
+    background-color: yellow;
+    min-height: 48px;
+}
+div.phocoaWFMessageBox div.phocoaWFMessageBox_message {
+    margin-left: 65px;
+}
+img.phocoaWFMessageBox_icon {
+    float: left;
+    margin: 0 8px 0 5px;
+    padding: 0;
+    width: 48px;
+    height: 48px;
+}
+div.phocoaWFMessageBox_Info {
+    border: 2px solid green;
+}
+div.phocoaWFMessageBox_Warning {
+    border: 2px solid orange;
+}
+div.phocoaWFMessageBox_Error {
+    border: 2px solid red;
+}
+div.phocoaWFMessageBox_Confirm {
+    border: 2px solid orange;
+}
+
+div.phocoaWFDieselNav_FilterInfo {
+    border: 1px solid black;
+    font-size: 13px;
+    margin: 5px;
+    padding: 8px;
+    height: 45px;
+    float: left;
+    width: auto;
+}
+div.phocoaWFDieselNav_Popup {
+    border: 1px solid black;
+    width: 500px;
+    height: 500px;
+    overflow: auto;
+    position: absolute;
+    background: white;
+    z-index: 10000;
+}
+div.phocoaWFDieselNav_Loading {
+    background-image: url(widgets/WFDieselNav/loading.gif);
+    width: 220px;
+    height: 19px;
+    margin: auto;
+}
+
+/* WFSearchField */
+.phocoaWFSearchField_PlaceholderText {
+    font-style: italic;
+    color: #999999;
+}
+.phocoaWFSearchField_Container {
+    white-space: nowrap;
+}
+.phocoaWFSearchField_Clear {
+    position: relative;
+    left: -15px;
+}
+.phocoaWFSearchField_Search {
+    position: relative;
+    left: -10px;
+}
+
+/* WFSpamHoneypot */
+input[type=text].phocoaWFSpamHoneypot_input {
+    width: 2px;
+    height: 2px;
+    margin: 0;
+    padding: 0;
+    border: none;
+    visibility: hidden;
+}

@@ -1,0 +1,8 @@
+
+bio: 
+  bindings: 
+    value: 
+      controllerKey: selection
+      instanceID   : person
+      modelKeyPath : bio
+  class   : WFTextArea

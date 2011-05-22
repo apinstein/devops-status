@@ -17,7 +17,7 @@ if (!defined('WF_LOG_DEPRECATED'))
 }
 
 require('framework/WFLog.php');    // need this for the PEAR_LOG_* constants below, which can't autoload.
-if (IS_PRODUCTION)
+if (0 and IS_PRODUCTION)
 {
     error_reporting(E_ALL);
     ini_set('display_errors', false);

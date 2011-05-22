@@ -1,0 +1,42 @@
+a:14:{s:7:"attribs";a:4:{s:5:"xmlns";s:36:"http://pear.php.net/dtd/rest.release";s:9:"xmlns:xsi";s:41:"http://www.w3.org/2001/XMLSchema-instance";s:11:"xmlns:xlink";s:28:"http://www.w3.org/1999/xlink";s:18:"xsi:schemaLocation";s:81:"http://pear.php.net/dtd/rest.release     http://pear.php.net/dtd/rest.release.xsd";}s:1:"p";a:2:{s:7:"attribs";a:1:{s:10:"xlink:href";s:12:"/rest/p/pear";}s:8:"_content";s:4:"PEAR";}s:1:"c";s:12:"pear.php.net";s:1:"v";s:5:"1.9.2";s:2:"st";s:6:"stable";s:1:"l";s:15:"New BSD License";s:1:"m";s:5:"dufuz";s:1:"s";s:16:"PEAR Base System";s:1:"d";s:1100:"The PEAR package contains:
+ * the PEAR installer, for creating, distributing
+   and installing packages
+ * the PEAR_Exception PHP5 error handling mechanism
+ * the PEAR_ErrorStack advanced error handling mechanism
+ * the PEAR_Error error handling mechanism
+ * the OS_Guess class for retrieving info about the OS
+   where PHP is running on
+ * the System class for quick handling of common operations
+   with files and directories
+ * the PEAR base class
+  Features in a nutshell:
+  * full support for channels
+  * pre-download dependency validation
+  * new package.xml 2.0 format allows tremendous flexibility while maintaining BC
+  * support for optional dependency groups and limited support for sub-packaging
+  * robust dependency support
+  * full dependency validation on uninstall
+  * remote install for hosts with only ftp access - no more problems with
+    restricted host installation
+  * full support for mirroring
+  * support for bundling several packages into a single tarball
+  * support for static dependencies on a url-based package
+  * support for custom file roles and installation tasks";s:2:"da";s:19:"2011-02-28 18:58:49";s:1:"n";s:1228:"Important! This is a security fix release. The advisory can be found at
+http://pear.php.net/advisory-20110228.txt
+
+  Bugs:
+  * Fixed Bug #17463: Regression: On Windows, svntag [patch by doconnor]
+  * Fixed Bug #17641: pecl-list doesn't sort packages by name [dufuz]
+  * Fixed Bug #17781: invalid argument warning on foreach due to an empty optional dependencie [dufuz]
+  * Fixed Bug #17801: PEAR run-tests wrongly detects php-cgi [patch by David Jean Louis (izi)]
+  * Fixed Bug #17839: pear svntag does not tag package.xml file [dufuz]
+  * Fixed Bug #17986: PEAR Installer cannot handle files moved between packages [dufuz]
+  * Fixed Bug #17997: Strange output if directories are not writeable [dufuz]
+  * Fixed Bug #18001: PEAR/RunTest coverage fails [dufuz]
+  * Fixed Bug #18056 [SECURITY]: Symlink attack in PEAR install [dufuz]
+  * Fixed Bug #18218: "pear package" does not allow the use of late static binding [dufuz and Christer Edvartsen]
+  * Fixed Bug #18238: Wrong return code from "pear help" [till]
+  * Fixed Bug #18308: Broken error message about missing channel validator [yunosh]
+
+  This feature is implemented as a result of #18056
+  * Implemented Request #16648: Use TMPDIR for builds instead of /var/tmp [dufuz]";s:1:"f";s:6:"295120";s:1:"g";s:34:"http://pear.php.net/get/PEAR-1.9.2";s:1:"x";a:1:{s:7:"attribs";a:1:{s:10:"xlink:href";s:17:"package.1.9.2.xml";}}}

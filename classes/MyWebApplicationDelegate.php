@@ -14,6 +14,16 @@ class MyWebApplicationDelegate
         $webapp = WFWebApplication::sharedWebApplication();
         $webapp->addModulePath('login', FRAMEWORK_DIR . '/modules/login');
         $webapp->addModulePath('css', FRAMEWORK_DIR . '/modules/css');
+
+        // bootstrap shared dirs
+        foreach (array('log', 'smarty/templates_c', 'runtime') as $d) {
+            $dPath = SHARED_DIR . "/{$d}";
+            if (!file_exists($dPath))
+            {
+                $ok = mkdir($dPath, 2775, true);
+                if (!$ok) throw new Exception("Couldn't bootstrap shared dir {$dPath}.");
+            }
+        }
     }
     
     function defaultInvocationPath()

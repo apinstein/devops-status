@@ -16,7 +16,7 @@ class MyWebApplicationDelegate
         $webapp->addModulePath('css', FRAMEWORK_DIR . '/modules/css');
 
         // bootstrap shared dirs
-        foreach (array('log', 'smarty/templates_c', 'runtime') as $d) {
+        foreach (array('log', 'runtime', 'runtime/smarty/templates_c') as $d) {
             $dPath = SHARED_DIR . "/{$d}";
             if (!file_exists($dPath))
             {

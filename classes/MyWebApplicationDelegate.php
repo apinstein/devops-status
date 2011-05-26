@@ -20,7 +20,7 @@ class MyWebApplicationDelegate
             $dPath = SHARED_DIR . "/{$d}";
             if (!file_exists($dPath))
             {
-                $ok = mkdir($dPath, 2775, true);
+                $ok = mkdir($dPath, 0775, true);
                 if (!$ok) throw new Exception("Couldn't bootstrap shared dir {$dPath}.");
             }
         }

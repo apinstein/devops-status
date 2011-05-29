@@ -35,14 +35,19 @@ class module_heartbeat_ping
 {
     public function parameterList()
     {
-        return array('checkId');
+        return array('checkId', 'reporter');
     }
     public function noAction($page, $params)
     {
-        if (!$params['checkId']) throw new Exception("checkId required for ping.");
+        if (!$params['checkId']) throw new WFRequestController_NotFoundException("Not a known checkId");
+        if (!$params['reporter']) throw new WFRequestController_HTTPException("Reporter required.", 403);
 
         $checks = $page->module()->loadChecks();
-        $checks[$params['checkId']] = time();
+        $checks[$params['checkId']] = array(
+            'time'     => time(),
+            'reporter' => $params['reporter'],
+            'ip'       => $_SERVER['REMOTE_ADDR']
+            );
         $page->module()->saveChecks($checks);
     }
 }
@@ -66,11 +71,15 @@ class module_heartbeat_status
             $checks = array($params['checkId'] => $checks[$params['checkId']]);
         }
 
+        $allAlive = true;
         $alive = array();
-        foreach ($checks as $k => $last) {
-            $alive[$k] = $last > $sinceU;
+        foreach ($checks as $k => $hearbeat) {
+            $checkIsAlive = $hearbeat['time'] > $sinceU;
+            $alive[$k] = $checkIsAlive;
+            $allAlive &= $checkIsAlive;
         }
         $page->assign('checks', $checks);
         $page->assign('alive', $alive);
+        $page->assign('allAlive', $allAlive);
     }
 }

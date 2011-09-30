@@ -40,7 +40,7 @@ class module_heartbeat_ping
     public function noAction($page, $params)
     {
         if (!$params['checkId']) throw new WFRequestController_NotFoundException("Not a known checkId");
-        if (!$params['reporter']) throw new WFRequestController_HTTPException("Reporter required.", 403);
+        if (!$params['reporter']) throw new WFRequestController_HTTPException("Reporter required.", 200);
 
         $checks = $page->module()->loadChecks();
         $checks[$params['checkId']] = array(

@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+// 2011 Kanwei Li
+
+// check inputs
+if($argc < 2) errExit("Usage: hearbeat-client [check]");
+
+// coalesce config settings
+if ($env_reporter = getenv("REPORTER")) {
+    define("REPORTER", rawurlencode($env_reporter));
+} else {
+    define("REPORTER", "anonymous");
+}
+
+if ($env_endpoint = getenv("API_ENDPOINT")) {
+    // short-circuit NOOP for testing
+    if ($env_endpoint == "TEST") exit(0);
+
+    define("ENDPOINT", $env_endpoint);
+} else {
+    define("ENDPOINT", "http://devops-status.pagodabox.com");
+}
+
+// sent heartbeat ping
+$err = NULL;
+$check = rawurlencode($argv[1]);
+$url = ENDPOINT . "/heartbeat/ping/$check/". REPORTER;
+$ping = curl_init($url);
+curl_setopt($ping, CURLOPT_RETURNTRANSFER, true);
+$ret = curl_exec($ping);
+if ($ret === false) $err = "Ping to '{$url}' failed: " . curl_error($ping);
+$httpResult = curl_getinfo($ping, CURLINFO_HTTP_CODE);
+if ($httpResult < 200 or $httpResult >= 300) $err = "Ping to '{$url}' failed with HTTP code: {$httpResult}";
+curl_close($ping);
+
+if ($err) errExit($err);
+exit(0);
+
+function errExit($msg)
+{
+    print $msg . "\n";
+    exit(1);
+}

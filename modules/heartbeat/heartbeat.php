@@ -83,3 +83,26 @@ class module_heartbeat_status
         $page->assign('allAlive', $allAlive);
     }
 }
+
+class module_heartbeat_clear
+{
+    public function parameterList()
+    {
+        return array('checkId');
+    }
+    public function noAction($page, $params)
+    {
+        if (!$params['checkId']) throw new WFRequestController_NotFoundException("Not a known checkId");
+
+        $checks = $page->module()->loadChecks();
+        if ($params['checkId'] === 'ALL')
+        {
+            $checks = array();
+        }
+        else if (isset($checks[$params['checkId']])) 
+        {
+            unset($checks[$params['checkId']]);
+        }
+        $page->module()->saveChecks($checks);
+    }
+}

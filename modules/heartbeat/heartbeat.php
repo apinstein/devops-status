@@ -80,7 +80,22 @@ class module_heartbeat_status
         }
         $page->assign('checks', $checks);
         $page->assign('alive', $alive);
-        $page->assign('allAlive', $allAlive);
+        if ($allAlive)
+        {
+            if (!empty($checks))
+            {
+                $overallStatus = "ALL ALIVE";
+            }
+            else
+            {
+                $overallStatus = "NO CHECKS.";
+            }
+        }
+        else
+        {
+            $overallStatus = "PROBLEM";
+        }
+        $page->assign('overallStatus', $overallStatus);
     }
 }
 

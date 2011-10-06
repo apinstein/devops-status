@@ -6,7 +6,7 @@ $spec = Pearfarm_PackageSpec::create(array(Pearfarm_PackageSpec::OPT_BASEDIR => 
              ->setChannel('apinstein.pearfarm.org')
              ->setSummary('Client for devops heartbeat system.')
              ->setDescription('Command line client for pinging a devops-status instance.')
-             ->setReleaseVersion('0.0.4')
+             ->setReleaseVersion('0.0.5')
              ->setReleaseStability('stable')
              ->setApiVersion('0.0.3')
              ->setApiStability('alpha')

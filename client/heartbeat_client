@@ -14,7 +14,11 @@ if ($env_reporter = getenv("REPORTER")) {
 
 if ($env_endpoint = getenv("API_ENDPOINT")) {
     // short-circuit NOOP for testing
-    if ($env_endpoint == "TEST") exit(0);
+    if ($env_endpoint == "TEST")
+    {
+        print "TEST HEARTBEAT SUCCESSFULLY RECORDED.\n";
+        exit(0);
+    }
 
     define("ENDPOINT", $env_endpoint);
 } else {

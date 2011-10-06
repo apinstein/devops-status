@@ -88,7 +88,7 @@ class module_heartbeat_status
             }
             else
             {
-                $overallStatus = "NO CHECKS.";
+                $overallStatus = "NO CHECKS";
             }
         }
         else

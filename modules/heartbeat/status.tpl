@@ -1,4 +1,4 @@
-<h2>Overall Status: {$overallStatus}</h2>
+<h2>Overall Status: {$overallStatus}.</h2>
 <table>
     <tr>
         <th>Check ID</th>

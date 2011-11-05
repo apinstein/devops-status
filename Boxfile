@@ -6,6 +6,5 @@ web1:
         - yaml
         - json
         - xdebug
-    document_root: /wwwroot
     shared_writable_dirs:
         - /shared

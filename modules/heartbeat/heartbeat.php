@@ -46,7 +46,7 @@ class module_heartbeat_ping
         $checks[$params['checkId']] = array(
             'time'     => time(),
             'reporter' => $params['reporter'],
-            'ip'       => $_SERVER['REMOTE_ADDR']
+            'ip'       => isset($_SERVER["HTTP_X_FORWARDED_FOR"]) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']
             );
         $page->module()->saveChecks($checks);
     }

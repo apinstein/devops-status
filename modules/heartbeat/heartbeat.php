@@ -65,10 +65,25 @@ class module_heartbeat_status
         $now = time();
         $sinceU = $now - strtotime($since, 0);
 
-        $checks = $page->module()->loadChecks();
-        if ($params['checkId'])
+        $checksDb = $page->module()->loadChecks();
+        if ($params['checkId'][0] === '^')  // regex mode
         {
-            $checks = array($params['checkId'] => $checks[$params['checkId']]);
+            $regexFilter = "/{$params['checkId']}/";
+        }
+        else if ($params['checkId'])        // match one mode (BC)
+        {
+            $regexFilter = "/^{$params['checkId']}\$/";
+        }
+        else                                // show call
+        {
+            $regexFilter = "/.*/";
+        }
+        $checks = array();
+        foreach ($checksDb as $k => $v) {
+            if (preg_match($regexFilter, $k) === 1)
+            {
+                $checks[$k] = $v;
+            }
         }
 
         $allAlive = true;

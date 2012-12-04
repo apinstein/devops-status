@@ -35,7 +35,7 @@ class module_heartbeat_ping
 {
     public function parameterList()
     {
-        return array('checkId', 'reporter');
+        return array('checkId', 'reporter', 'interval');
     }
     public function noAction($page, $params)
     {
@@ -46,7 +46,8 @@ class module_heartbeat_ping
         $checks[$params['checkId']] = array(
             'time'     => time(),
             'reporter' => $params['reporter'],
-            'ip'       => isset($_SERVER["HTTP_X_FORWARDED_FOR"]) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR']
+            'ip'       => isset($_SERVER["HTTP_X_FORWARDED_FOR"]) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'],
+            'interval' => $params['interval'],
             );
         $page->module()->saveChecks($checks);
     }
@@ -60,13 +61,8 @@ class module_heartbeat_status
     }
     public function noAction($page, $params)
     {
-        $since = $params['since'] ? $params['since'] : '24 hours';
-
-        $now = time();
-        $sinceU = $now - strtotime($since, 0);
-
         $checksDb = $page->module()->loadChecks();
-        if ($params['checkId'][0] === '^')  // regex mode
+        if ($params['checkId'] && $params['checkId'][0] === '^')  // regex mode
         {
             $regexFilter = "/{$params['checkId']}/";
         }
@@ -86,13 +82,39 @@ class module_heartbeat_status
             }
         }
 
+        // EXPECTED check-in interval is first of OVERRIDE, CHECK VALUE, DEFAULT VALUE
+        $overrideInterval = $params['since'];
+        $defaultInterval = '24 hours';
+
         $allAlive = true;
         $alive = array();
-        foreach ($checks as $k => $hearbeat) {
-            $checkIsAlive = $hearbeat['time'] > $sinceU;
+        $now = time();
+        foreach ($checks as $k => $heartbeat) {
+            $checkInterval = isset($heartbeat['interval']) ? $heartbeat['interval'] : NULL;
+
+            $expectedCheckinInterval = NULL;
+            $expectedCheckinU = NULL;
+
+            foreach (array('overrideInterval', 'checkInterval', 'defaultInterval') as $v) {
+                if ($$v === NULL) continue;
+
+                $u = strtotime($$v, 0);
+                if ($u === false) continue;
+
+                $expectedCheckinInterval = $$v;
+                $expectedCheckinU = $now - $u;
+                break;
+            }
+            if (!$expectedCheckinU) throw new Exception("Couldn't figure out interval. Should never happen if defaultInterval is sane: '{$defaultInterval}'.");
+
+            $checks[$k]['intervalReportingBasis'] = $expectedCheckinInterval;
+            $checks[$k]['expectedCheckinBy'] = $expectedCheckinU;
+
+            $checkIsAlive = $heartbeat['time'] > $expectedCheckinU;
             $alive[$k] = $checkIsAlive;
             $allAlive &= $checkIsAlive;
         }
+        $page->assign('now', $now);
         $page->assign('checks', $checks);
         $page->assign('alive', $alive);
         if ($allAlive)

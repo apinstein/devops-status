@@ -8,7 +8,7 @@
     {WFSkinCSS file="default.css"}
 </head>
 <body class="yui-skin-sam">
-<div id="doc4">
+<div id="doc3">
     <div id="hd">
         <h1>DevOps Status</h1>
     </div>

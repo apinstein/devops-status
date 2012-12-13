@@ -1,3 +1,15 @@
+{WFHead}
+<style type="text/css">
+{literal}
+table { 
+    margin: auto;
+}
+td, th {
+    white-space: nowrap;
+}
+{/literal}
+</style>
+{/WFHead}
 <h2>Overall Status: {$overallStatus}.</h2>
 <h4>Status as of {$now|date_format:'%A %d-%b-%y %T %Z'}</h4>
 <table>
